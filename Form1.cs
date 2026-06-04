@@ -1270,8 +1270,34 @@ namespace AudioProject
             _btnStop = MakeIconBtn("⏹", C_RED, new Point(bx, 82), playCard);
 
             _btnPlay.Click += (s, e) => { _audioService.Play(_currentFilePath); SetStatus("▶  Playing..."); UpdateControlStates(); };
-            _btnPause.Click += (s, e) => { _audioService.Pause(); SetStatus("⏸  Paused."); UpdateControlStates(); };
-            _btnStop.Click += (s, e) => { _audioService.Stop(); SetStatus("⏹  Stopped."); UpdateControlStates(); };
+            _btnPause.Click += (s, e) =>
+            {
+                if (_audioService.IsPlaying)
+                {
+                    _audioService.Pause();
+                    _btnPause.Text = "▶️▶️";   // يتغير الأيقونة ليشير للـ Resume
+                    _btnPause.ForeColor = C_GREEN;
+                    SetStatus("⏸️  Paused.");
+                }
+                else if (_audioService.IsPaused)
+                {
+                    _audioService.Resume();
+                    _btnPause.Text = "⏸️";
+                    _btnPause.ForeColor = C_ORANGE;
+                    SetStatus("▶️  Resumed.");
+                }
+                UpdateControlStates();
+            };
+
+            _btnStop.Click += (s, e) =>
+            {
+                _audioService.Stop();
+                _btnPause.Text = "⏸️";       // ← reset الأيقونة
+                _btnPause.ForeColor = C_ORANGE;
+                SetStatus("⏹️  Stopped.");
+                UpdateControlStates();
+            };
+
 
             return root;
         }
@@ -1667,7 +1693,8 @@ namespace AudioProject
                 }));
 
             _audioService.PlaybackStopped += (s, e) =>
-                Invoke((Action)(() => UpdateControlStates()));
+                
+            Invoke((Action)(() => UpdateControlStates()));
         }
 
         // ══════════════════════════════════════════
@@ -1793,6 +1820,9 @@ namespace AudioProject
             chart.Plot.FigureBackground.Color = ScottPlot.Color.FromHex("#16171C");
             chart.Plot.DataBackground.Color = ScottPlot.Color.FromHex("#1A1D24");
             chart.Plot.Axes.Color(ScottPlot.Color.FromHex("#78849E"));
+            // ✅ تثبيت نطاق المحور Y من -500 إلى 500
+            chart.Plot.Axes.SetLimitsY(-2000, 2000);
+            chart.Plot.Axes.SetLimitsX(-3000, 2000);
             chart.Refresh();
         }
 
@@ -1844,8 +1874,11 @@ namespace AudioProject
             bool playing = _audioService.IsPlaying;
             bool paused = _audioService.IsPaused;
 
-            _btnPlay.Enabled = hasFile && !playing;
-            _btnPause.Enabled = playing;
+
+            _btnPlay.Enabled = hasFile && !playing;         // ← مو متغير
+            _btnPause.Enabled = playing || paused;           // ← هون الإصلاح: paused كمان
+            //_btnPlay.Enabled = hasFile && !playing;
+            //_btnPause.Enabled = playing;
             _btnStop.Enabled = playing || paused;
             _btnCompress.Enabled = hasFile;
             _btnDecompress.Enabled = hasResult;
