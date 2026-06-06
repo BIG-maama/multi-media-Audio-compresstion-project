@@ -53,7 +53,7 @@ namespace AudioProject.Services
 
                 // 3. Compress in chunks with progress reporting
                 var result = await Task.Run(() =>
-                    CompressWithProgress(samples, algorithm, settings, token), token);
+                    CompressWithProgress(inputPath, samples, algorithm, settings, token), token);
 
                 if (result != null)
                     CompressionCompleted?.Invoke(result);
@@ -89,7 +89,7 @@ namespace AudioProject.Services
         public void Cancel() => _cts?.Cancel();
 
         // ───── Chunk-based processing with progress ─────
-        private CompressionResult CompressWithProgress(short[] samples,
+        private CompressionResult CompressWithProgress(string inputPath, short[] samples,
                                                        ICompressionAlgorithm algorithm,
                                                        CompressionSettings settings,
                                                        CancellationToken token)
@@ -98,7 +98,8 @@ namespace AudioProject.Services
             int totalChunks = (int)Math.Ceiling(samples.Length / (double)ChunkSize);
             var allBytes = new System.Collections.Generic.List<byte>();
             long startTime = System.Diagnostics.Stopwatch.GetTimestamp();
-            long originalSize = samples.Length * 2;
+            long originalSize = new System.IO.FileInfo(inputPath).Length;
+
 
             for (int chunk = 0; chunk < totalChunks; chunk++)
             {
