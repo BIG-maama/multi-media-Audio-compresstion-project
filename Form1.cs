@@ -1002,7 +1002,7 @@ namespace AudioProject
         // ──────────────────────────────────────────
         private void ConfigureForm()
         {
-            Text = "Audio Compressor  |  Damascus University — 2026";
+            Text = "Audio Compressor ";
             Size = new Size(1340, 840);
             MinimumSize = new Size(1180, 780);
             BackColor = C_BG;
@@ -1088,7 +1088,7 @@ namespace AudioProject
 
             var sub = new Label
             {
-                Text = "Multimedia Systems · Damascus University · 2026",
+                Text = "Multimedia Systems ",
                 Font = F_SMALL,
                 ForeColor = C_SUBTEXT,
                 Location = new Point(48, 32),
@@ -1398,12 +1398,12 @@ namespace AudioProject
             var chartCard = SectionCard("Real-Time Monitor", 0, 408, 0, 0);
             chartCard.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             chartCard.Width = root.Width;
-            chartCard.Height = root.Height - 416;
+            chartCard.Height = root.Height - 516;
             root.Controls.Add(chartCard);
             root.Resize += (s, e) =>
             {
                 chartCard.Width = root.Width;
-                chartCard.Height = root.Height - 416;
+                chartCard.Height = root.Height - 516;
                 LayoutCharts(chartCard);
             };
 
@@ -1460,11 +1460,17 @@ namespace AudioProject
             hdr.Controls.Add(hdrLbl);
             card.Controls.Add(hdr);
 
-            // save button
-            _btnSave = MakeBtn("💾  Save Compressed File", C_GREEN, 20, 150);
-            _btnSave.Dock = DockStyle.Bottom;
+
+            _btnSave = MakeBtn("💾  Save Compressed File", C_GREEN, 20, 40);
+            _btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            _btnSave.Left = 10;
+            _btnSave.Width = card.Width - 20;
+            // غيّر الـ 20 لتحريك الزر للأعلى أو للأسفل
+            _btnSave.Top = card.Height - 100;
             _btnSave.Click += (s, e) => SaveFile();
             card.Controls.Add(_btnSave);
+
+           
 
             // report box
             _rtbReport = new RichTextBox

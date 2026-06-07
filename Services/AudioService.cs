@@ -133,6 +133,9 @@ namespace AudioProject.Services
         /// </summary>
         public void SaveAsWav(short[] samples, string outputPath, int sampleRate, int channels = 1)
         {
+
+            Stop(); // أضف هذا السطر   
+
             var format = new WaveFormat(sampleRate, 16, channels);
 
             using var writer = new WaveFileWriter(outputPath, format);
