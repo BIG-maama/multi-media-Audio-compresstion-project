@@ -3,10 +3,7 @@ using AudioProject.Models;
 
 namespace AudioProject.Algorithms
 {
-    /// <summary>
-    /// Factory Pattern — returns the correct algorithm instance
-    /// based on user selection
-    /// </summary>
+
     public static class AlgorithmFactory
     {
         public static ICompressionAlgorithm Create(AlgorithmType type)

@@ -4,16 +4,13 @@ using AudioProject.Models;
 
 namespace AudioProject.Algorithms
 {
-    /// <summary>
-    /// Predictive Differential Coding
-    /// يتنبأ بالعينة التالية ويخزن الخطأ فقط
-    /// </summary>
+  
     public class PredictiveDifferentialCoding : ICompressionAlgorithm
     {
         public string Name => "Predictive Differential Coding";
         public string Description => "يتنبأ بالعينة القادمة ويخزن فرق التنبؤ فقط";
 
-        // ───── Compress ─────
+      
         public CompressionResult Compress(short[] samples, CompressionSettings settings)
         {
             var sw = Stopwatch.StartNew();
@@ -24,11 +21,9 @@ namespace AudioProject.Algorithms
 
             for (int i = 0; i < samples.Length; i++)
             {
-                // التنبؤ بالعينة = 2 × السابقة − قبل السابقة
                 int predicted = (2 * prev1) - prev2;
                 int error = samples[i] - predicted;
 
-                // نقيّد الخطأ في حدود byte
                 int clamped = Math.Max(-128, Math.Min(127, error));
                 compressed[i] = (byte)(clamped + 128);
 
@@ -50,7 +45,6 @@ namespace AudioProject.Algorithms
             return result;
         }
 
-        // ───── Decompress ─────
         public short[] Decompress(byte[] compressedData, CompressionSettings settings)
         {
             short[] samples = new short[compressedData.Length];

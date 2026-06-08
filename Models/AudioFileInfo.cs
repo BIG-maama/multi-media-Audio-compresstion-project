@@ -1,8 +1,6 @@
 ﻿namespace AudioProject.Models
 {
-    /// <summary>
-    /// Holds all audio file properties displayed in the UI
-    /// </summary>
+
     public class AudioFileInfo
     {
         public string FilePath { get; set; }
@@ -15,7 +13,7 @@
         public string Encoding { get; set; }
         public int BitsPerSample { get; set; }
 
-        // ───── Formatted display properties ─────
+ 
         public string FileSizeFormatted
         {
             get

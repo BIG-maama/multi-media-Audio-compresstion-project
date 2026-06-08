@@ -1,8 +1,6 @@
 ﻿namespace AudioProject.Algorithms
 {
-    /// <summary>
-    /// نتيجة عملية الضغط الكاملة
-    /// </summary>
+   
     public class CompressionResult
     {
         public byte[] CompressedData { get; set; }
@@ -10,7 +8,7 @@
         public long CompressedSize { get; set; }
         public double CompressionRatio { get; set; }
         public double SpaceSavingPercent { get; set; }
-        public double ProcessingTime { get; set; }  // بالثواني
+        public double ProcessingTime { get; set; } 
         public string AlgorithmUsed { get; set; }
 
         public void Calculate()

@@ -4,23 +4,18 @@ using AudioProject.Models;
 
 namespace AudioProject.Algorithms
 {
-    /// <summary>
-    /// Delta Modulation
-    /// يمثّل كل تغيير بـ bit واحد فقط (صعود = 1 / هبوط = 0)
-    /// </summary>
+    
     public class DeltaModulation : ICompressionAlgorithm
     {
         public string Name => "Delta Modulation";
         public string Description => "يمثّل التغيير بـ bit واحد فقط، أعلى نسبة ضغط";
 
-        // ───── Compress ─────
         public CompressionResult Compress(short[] samples, CompressionSettings settings)
         {
             var sw = Stopwatch.StartNew();
             int step = (int)settings.StepSize;
             int approx = 0;
 
-            // كل 8 عينات = byte واحد
             byte[] compressed = new byte[(samples.Length + 7) / 8];
 
             for (int i = 0; i < samples.Length; i++)
@@ -30,15 +25,15 @@ namespace AudioProject.Algorithms
 
                 if (samples[i] >= approx)
                 {
-                    compressed[byteIndex] |= (byte)(1 << bitIndex); // bit = 1 → صعود
+                    compressed[byteIndex] |= (byte)(1 << bitIndex); 
                     approx += step;
                 }
                 else
                 {
-                    approx -= step; // bit = 0 → هبوط
+                    approx -= step; 
                 }
 
-                // نمنع الـ overflow
+              
                 approx = Math.Max(short.MinValue, Math.Min(short.MaxValue, approx));
             }
 
@@ -56,7 +51,7 @@ namespace AudioProject.Algorithms
             return result;
         }
 
-        // ───── Decompress ─────
+    
         public short[] Decompress(byte[] compressedData, CompressionSettings settings)
         {
             int totalSamples = compressedData.Length * 8;

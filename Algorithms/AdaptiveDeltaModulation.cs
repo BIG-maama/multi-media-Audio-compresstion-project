@@ -10,14 +10,14 @@ public class AdaptiveDeltaModulation : ICompressionAlgorithm
 
     private const double StepGrowth = 1.5;
     private const double StepShrink = 0.5;
-    private const int MinStep = 16;      // ← لا يجب أن يكون 1، صوت ضعيف جداً
-    private const int MaxStep = 8192;    // ← حد أعلى معقول
+    private const int MinStep = 16;      
+    private const int MaxStep = 8192;    
 
     public CompressionResult Compress(short[] samples, CompressionSettings settings)
     {
         var sw = Stopwatch.StartNew();
         int step = Math.Max(MinStep, (int)settings.StepSize);
-        int approx = 0;          // التقدير الحالي
+        int approx = 0;        
         bool lastBit = false;
 
         byte[] compressed = new byte[(samples.Length + 7) / 8];
@@ -25,33 +25,32 @@ public class AdaptiveDeltaModulation : ICompressionAlgorithm
         for (int i = 0; i < samples.Length; i++)
         {
             int byteIndex = i / 8;
-            int bitIndex = i % 8;  // 0..7
+            int bitIndex = i % 8;  
             bool currentBit;
 
-            // المقارنة: هل الـ sample الأصلي أعلى من تقديرنا؟
+            
             if (samples[i] >= approx)
             {
                 currentBit = true;
-                approx += step;     // ارفع التقدير
+                approx += step;     
             }
             else
             {
                 currentBit = false;
-                approx -= step;     // خفض التقدير
+                approx -= step;     
             }
 
-            // تعديل الخطوة adaptively
+            
             if (currentBit == lastBit)
                 step = (int)Math.Min(step * StepGrowth, MaxStep);
             else
                 step = (int)Math.Max(step * StepShrink, MinStep);
 
-            // تأكد من أن approx في نطاق short
             approx = Math.Max(short.MinValue, Math.Min(short.MaxValue, approx));
 
             lastBit = currentBit;
 
-            // تخزين البت (LSB first)
+           
             if (currentBit)
                 compressed[byteIndex] |= (byte)(1 << bitIndex);
         }
@@ -74,8 +73,8 @@ public class AdaptiveDeltaModulation : ICompressionAlgorithm
     {
         int totalSamples = compressedData.Length * 8;
         short[] samples = new short[totalSamples];
-        int step = Math.Max(MinStep, (int)settings.StepSize);  // ← نفس القيمة الابتدائية!
-        int approx = 0;      // ← يجب أن يبدأ من نفس القيمة كما في Compress!
+        int step = Math.Max(MinStep, (int)settings.StepSize);  
+        int approx = 0;     
         bool lastBit = false;
 
         for (int i = 0; i < totalSamples; i++)
@@ -83,16 +82,14 @@ public class AdaptiveDeltaModulation : ICompressionAlgorithm
             int byteIndex = i / 8;
             int bitIndex = i % 8;
 
-            // استخراج البت (LSB first - نفس الترتيب)
+            
             bool currentBit = (compressedData[byteIndex] & (1 << bitIndex)) != 0;
 
-            // نفس المنطق تماماً كما في Compress
             if (currentBit)
                 approx += step;
             else
                 approx -= step;
 
-            // نفس التعديل على الخطوة
             if (currentBit == lastBit)
                 step = (int)Math.Min(step * StepGrowth, MaxStep);
             else

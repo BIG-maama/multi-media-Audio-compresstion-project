@@ -3,16 +3,12 @@ using System.IO;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using AudioProject.Models;
-//namespace AudioProject.Services;
 namespace AudioProject.Services
 {
-    /// <summary>
-    /// Handles all audio file operations:
-    /// reading, property extraction, playback, and saving
-    /// </summary>
+ 
     public class AudioService : IDisposable
     {
-        // ───── Playback state ─────
+   
         private WaveOutEvent _waveOut;
         private AudioFileReader _audioReader;
         private bool _disposed = false;
@@ -22,11 +18,7 @@ namespace AudioProject.Services
 
         public event EventHandler PlaybackStopped;
 
-        // ───── Read file & extract properties ─────
-        /// <summary>
-        /// Reads an audio file and returns all its properties
-        /// Supports: WAV, MP3, AIFF, WMA
-        /// </summary>
+   
         public AudioFileInfo GetAudioFileInfo(string filePath)
         {
             if (!File.Exists(filePath))
@@ -50,16 +42,10 @@ namespace AudioProject.Services
             };
         }
 
-        // ───── Read raw samples for compression ─────
-        /// <summary>
-        /// Reads the audio file and returns raw PCM samples as short[]
-        /// Used by compression algorithms
-        /// </summary>
         public short[] ReadSamples(string filePath)
         {
             using var reader = new AudioFileReader(filePath);
 
-            // Convert to 16-bit PCM mono for processing
             var monoProvider = reader.ToMono();
             var sampleProvider = new SampleToWaveProvider16(monoProvider);
 
@@ -77,10 +63,10 @@ namespace AudioProject.Services
             return samples;
         }
 
-        // ───── Playback controls ─────
+        
         public void Play(string filePath)
         {
-            Stop(); // Stop any current playback first
+            Stop(); 
 
             _audioReader = new AudioFileReader(filePath);
             _waveOut = new WaveOutEvent();
@@ -109,32 +95,24 @@ namespace AudioProject.Services
             _audioReader = null;
         }
 
-        /// <summary>
-        /// Seek to a specific position (0.0 to 1.0)
-        /// </summary>
+       
         public void SeekTo(double positionRatio)
         {
             if (_audioReader == null) return;
             _audioReader.Position = (long)(_audioReader.Length * positionRatio);
         }
 
-        /// <summary>
-        /// Returns current playback position as ratio (0.0 to 1.0)
-        /// </summary>
+        
         public double GetPlaybackPosition()
         {
             if (_audioReader == null || _audioReader.Length == 0) return 0;
             return (double)_audioReader.Position / _audioReader.Length;
         }
 
-        // ───── Save compressed audio ─────
-        /// <summary>
-        /// Saves decompressed PCM samples back to WAV file
-        /// </summary>
         public void SaveAsWav(short[] samples, string outputPath, int sampleRate, int channels = 1)
         {
 
-            Stop(); // أضف هذا السطر   
+            Stop(); 
 
             var format = new WaveFormat(sampleRate, 16, channels);
 
@@ -142,7 +120,7 @@ namespace AudioProject.Services
             writer.WriteSamples(samples, 0, samples.Length);
         }
 
-        // ───── Dispose ─────
+        
         public void Dispose()
         {
             if (_disposed) return;
@@ -152,7 +130,7 @@ namespace AudioProject.Services
         }
     }
 
-    // Extension helper — converts stereo to mono
+ 
     internal static class AudioExtensions
     {
         public static ISampleProvider ToMono(this AudioFileReader reader)
