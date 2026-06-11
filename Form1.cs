@@ -352,7 +352,7 @@ namespace AudioProject
                 if (_audioService.IsPlaying)
                 {
                     _audioService.Pause();
-                    _btnPause.Text = "▶️▶️";   // يتغير الأيقونة ليشير للـ Resume
+                    _btnPause.Text = "▶️▶️";   
                     _btnPause.ForeColor = C_GREEN;
                     SetStatus("⏸️  Paused.");
                 }
@@ -369,7 +369,7 @@ namespace AudioProject
             _btnStop.Click += (s, e) =>
             {
                 _audioService.Stop();
-                _btnPause.Text = "⏸️";       // ← reset الأيقونة
+                _btnPause.Text = "⏸️";      
                 _btnPause.ForeColor = C_ORANGE;
                 SetStatus("⏹️  Stopped.");
                 UpdateControlStates();
@@ -482,12 +482,12 @@ namespace AudioProject
             var chartCard = SectionCard("Real-Time Monitor", 0, 408, 0, 0);
             chartCard.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             chartCard.Width = root.Width;
-            chartCard.Height = root.Height - 516;
+            chartCard.Height = root.Height - 416;
             root.Controls.Add(chartCard);
             root.Resize += (s, e) =>
             {
                 chartCard.Width = root.Width;
-                chartCard.Height = root.Height - 516;
+                chartCard.Height = root.Height - 416;
                 LayoutCharts(chartCard);
             };
 
@@ -549,7 +549,6 @@ namespace AudioProject
             _btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             _btnSave.Left = 10;
             _btnSave.Width = card.Width - 20;
-            // غيّر الـ 20 لتحريك الزر للأعلى أو للأسفل
             _btnSave.Top = card.Height - 100;
             _btnSave.Click += (s, e) => SaveFile();
             card.Controls.Add(_btnSave);
@@ -699,9 +698,8 @@ namespace AudioProject
         }
         private void ResetSettingsOnly()
         {
-            // يعيد الإعدادات للقيم الافتراضية فقط
-            // الملف الصوتي يبقى محمّلاً
-            _cmbAlgorithm.SelectedIndex = 1;      // DPCM
+    
+            _cmbAlgorithm.SelectedIndex = 1;     
             _nudSampleRate.Value = 44100;
             _nudQuantLevels.Value = 256;
             _nudStepSize.Value = 100;
@@ -797,7 +795,6 @@ namespace AudioProject
             Invoke((Action)(() => UpdateControlStates()));
         }
 
-
         private void ShowReport(CompressionResult r)
         {
             _rtbReport.Clear();
@@ -806,20 +803,21 @@ namespace AudioProject
             ReportRow("Algorithm", r.AlgorithmUsed);
             AppendRtb("\n", C_TEXT, false);
 
-            // حجم الملف الأصلي على القرص
             long sourceFileSize = _audioInfo != null ? _audioInfo.FileSizeBytes : 0;
-            // حجم PCM الحقيقي اللي اشتغلت عليه الخوارزمية
             long pcmSize = r.OriginalSize;
-            // نسبة الضغط الصحيحة مقارنة بـ PCM
             double realRatio = pcmSize > 0 ? (double)pcmSize / r.CompressedSize : 0;
             double realSaving = pcmSize > 0 ? (1.0 - (double)r.CompressedSize / pcmSize) * 100.0 : 0;
 
+            bool isWav = _currentFilePath != null &&
+                         Path.GetExtension(_currentFilePath).ToLowerInvariant() == ".wav";
+
             ReportSection("FILE SIZE");
-            ReportRow("Source File", FormatKB(sourceFileSize));   // ← حجم الملف الأصلي MP3/WAV
-            ReportRow("PCM Raw", FormatKB(pcmSize));          // ← حجم PCM اللي اشتغلنا عليه
-            ReportRow("Compressed", FormatKB(r.CompressedSize)); // ← بعد الضغط
-            ReportRow("Ratio (PCM)", string.Format("{0:F2}x", realRatio));   // ← النسبة الصحيحة
-            ReportRow("Space Saved", string.Format("{0:F1}%", realSaving));  // ← التوفير الصحيح
+            ReportRow("Source File", FormatKB(sourceFileSize));
+            if (!isWav)
+                ReportRow("PCM Raw", FormatKB(pcmSize));
+            ReportRow("Compressed", FormatKB(r.CompressedSize));
+            ReportRow("Ratio (PCM)", string.Format("{0:F2}x", realRatio));
+            ReportRow("Space Saved", string.Format("{0:F1}%", realSaving));
             AppendRtb("\n", C_TEXT, false);
 
             ReportSection("PERFORMANCE");
@@ -841,12 +839,10 @@ namespace AudioProject
                 : "⚠  No size reduction on PCM data\n";
             AppendRtb(note, realSaving > 0 ? C_GREEN : C_ORANGE, true);
 
-            // ملاحظة توضيحية للأستاذ
             AppendRtb("\n", C_TEXT, false);
             AppendRtb("Note: Algorithms operate on raw PCM data.\n", C_SUBTEXT, false);
             AppendRtb("Source file may differ (e.g. MP3 is pre-compressed).\n", C_SUBTEXT, false);
         }
-
         private void AppendRtb(string text, Color col, bool bold)
         {
             _rtbReport.SelectionColor = col;
@@ -927,7 +923,6 @@ namespace AudioProject
             chart.Plot.FigureBackground.Color = ScottPlot.Color.FromHex("#16171C");
             chart.Plot.DataBackground.Color = ScottPlot.Color.FromHex("#1A1D24");
             chart.Plot.Axes.Color(ScottPlot.Color.FromHex("#78849E"));
-            // ✅ تثبيت نطاق المحور Y من -500 إلى 500
             chart.Plot.Axes.SetLimitsY(-2000, 2000);
             chart.Plot.Axes.SetLimitsX(-3000, 2000);
             chart.Refresh();
@@ -982,10 +977,8 @@ namespace AudioProject
             bool paused = _audioService.IsPaused;
 
 
-            _btnPlay.Enabled = hasFile && !playing;         // ← مو متغير
-            _btnPause.Enabled = playing || paused;           // ← هون الإصلاح: paused كمان
-            //_btnPlay.Enabled = hasFile && !playing;
-            //_btnPause.Enabled = playing;
+            _btnPlay.Enabled = hasFile && !playing;       
+            _btnPause.Enabled = playing || paused;           
             _btnStop.Enabled = playing || paused;
             _btnCompress.Enabled = hasFile;
             _btnDecompress.Enabled = hasResult;

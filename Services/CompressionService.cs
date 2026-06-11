@@ -91,8 +91,8 @@ namespace AudioProject.Services
             const int ChunkSize = 4096;
             int totalChunks = (int)Math.Ceiling(samples.Length / (double)ChunkSize);
             var allBytes = new System.Collections.Generic.List<byte>();
-            long startTime = System.Diagnostics.Stopwatch.GetTimestamp();// ✅ هذا يأخذ حجم PCM الحقيقي اللي اشتغلت عليه الخوارزمية
-            long originalSize = (long)samples.Length * 2; // short = 2 bytes
+            long startTime = System.Diagnostics.Stopwatch.GetTimestamp();
+            long originalSize = (long)samples.Length * 2; 
 
 
             for (int chunk = 0; chunk < totalChunks; chunk++)
